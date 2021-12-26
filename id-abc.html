@@ -1,0 +1,76 @@
+<div id="id-socket"></div>
+
+<ul id="list-chat"></ul>
+
+<input type="text" class="input-chat">
+
+<button id="sendMessage">Send Message Abc</button>
+
+Hello Socket Io
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>  
+
+document.querySelector(".input-chat").addEventListener("keyup",evt => {
+    if(evt.keyCode != 13) return;
+
+    socket.emit("server.chat", evt.target.value);
+});
+
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
+let id = 'abc'
+
+document.getElementById("id-socket").innerHTML = id;
+
+socket = io("http://localhost:3000",
+    {
+        autoConnect: false, 
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              'id' : id,
+            }
+          }
+    }
+})
+
+socket.connect();
+
+socket.on("connect", () => {
+    console.log(socket.disconnected); 
+
+    socket.on("client.message", (data) => {  
+        console.log(data);
+    });
+    // socket.emit("server.message", "ping");
+
+    socket.on("client.chat", (data) => {  
+        var node = document.createElement("li");                 // Create a <li> node
+        var textnode = document.createTextNode(data);         // Create a text node
+        node.appendChild(textnode);  
+        console.log(data);        
+        document.getElementById("list-chat").appendChild(node)
+    });
+
+    
+});
+
+socket.on("disconnect",() => {
+    console.log(socket.disconnected)
+});
+
+
+document.getElementById("sendMessage").addEventListener("click",() => {
+  socket.emit("server.message", "ping-abc");
+})
+
+setTimeout(() => {
+    // socket.disconnect();
+},5000)
+</script>

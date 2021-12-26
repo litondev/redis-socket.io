@@ -1,0 +1,54 @@
+Hello Socket Io
+
+<button id="sendMessage">Send Message</button>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>  
+function getRandomIntInclusive(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
+}
+
+
+id = ['abc','abcd'];
+
+socket = io("http://localhost:3000",
+    {
+        autoConnect: false, 
+        transportOptions: {
+          polling: {
+            extraHeaders: {
+              'id' : id[getRandomIntInclusive(0,1)]
+            }
+          }
+    }
+})
+
+socket.connect();
+
+socket.on("connect", () => {
+    console.log(socket.disconnected); 
+
+    socket.on("client.message", (data) => {  
+        console.log(data);
+    });
+
+    socket.on("client.chat", (data) => {  
+        console.log(data);        
+    });
+});
+
+socket.on("disconnect",() => {
+    console.log(socket.disconnected)
+});
+
+document.getElementById("sendMessage").addEventListener("click",() => {
+  socket.emit("server.message", "ping");
+})
+
+setTimeout(() => {
+    // socket.disconnect();
+},5000)
+</script>
